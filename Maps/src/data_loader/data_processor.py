@@ -5,7 +5,7 @@ class OSMJsonDataProcessor:
     _saved = {
         'top' : ['elements'],
         'elements' : ['id', 'lat', 'lon', 'tags', 'center'],
-        'tags' : ['addr:housenumber', 'addr:street', 'amenity', 'name']
+        'tags' : ['addr:housenumber', 'addr:street', 'amenity', 'name', 'website']
     }
 
     _arrays = ['top', 'elements']
