@@ -34,8 +34,8 @@ class MongoDBClient:
         self._cur_collection = collection_name
 
     def get_collection(self, collection_name) -> Collection:
-        assert collection_name in self._collections
-
+        #assert collection_name in self._collections
+        return self._db[collection_name]
         return self._get_collection(collection_name=collection_name)
 
     def _get_collection(self, collection_name) -> Collection:
