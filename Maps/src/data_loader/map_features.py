@@ -68,4 +68,17 @@ class MapBulding(Enum):
     SPORTS_PAVILION = 7
     SPORTS_SPORTSHALL = 8
     SPORTS_STADIUM = 9
-    
+
+
+class MapObjects(Enum):
+    AMENITY = 0
+    SHOP = 1
+    SUBWAY = 2
+    TOURISM = 3
+
+QueryMapping = {
+    MapObjects.AMENITY : 'amenity',
+    MapObjects.SHOP : 'shop',
+    MapObjects.SUBWAY : 'station',
+    MapObjects.TOURISM : 'tourism'
+}

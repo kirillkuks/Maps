@@ -4,8 +4,25 @@ import copy
 class OSMJsonDataProcessor:
     _saved = {
         'top' : ['elements'],
-        'elements' : ['id', 'lat', 'lon', 'tags', 'center'],
-        'tags' : ['addr:housenumber', 'addr:street', 'amenity', 'name', 'website']
+        'elements' : ['lat', 'lon', 'tags', 'center'],
+        'tags' : [
+            'addr:city'
+            'addr:housenumber',
+            'addr:street',
+            'amenity',
+            'building',
+            'name',
+            'website',
+            'contact:website',
+            'shop',
+            'phone',
+            'opening_hours',
+            'toilets',
+            'colour',
+            'station',
+            'network',
+            'tourism',
+            ]
     }
 
     _arrays = ['top', 'elements']
@@ -19,7 +36,8 @@ class OSMJsonDataProcessor:
             return self.clear_json(json_data=json.load(f), saved_fields=saved_fields)
 
     def clear_json(self):
-        return self._clear_json(self._json_data, 'top')        
+        res = self._clear_json(self._json_data, 'top')
+        return res['elements']
 
     def _clear_json(self, json_data, field_name):
         saved = self._saved[field_name]

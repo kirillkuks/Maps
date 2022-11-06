@@ -1,4 +1,7 @@
 Maps/src/data_loader/__pycache__
 Maps/src/data_base/__pycache__
 
+Maps/db/diagnostic.data
+Maps/db/journal
+
 Stuff/
