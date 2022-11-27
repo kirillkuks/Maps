@@ -34,6 +34,9 @@ class MongoDBClient:
         
         return self._get_collection(collection_name=collection_name)
 
+    def delete_all(self, collection_name) -> None:
+        self.get_collection(collection_name=collection_name).delete_many({})
+
     def _get_collection(self, collection_name) -> Collection:
         return self._db[collection_name] if collection_name in self._collections \
             else None
