@@ -22,11 +22,16 @@ class OSMJsonDataProcessor:
             'station',
             'network',
             'tourism',
+            'public_transport',
+            'sport',
+            'office',
+            'water'
             ]
     }
 
     _arrays = ['top', 'elements']
     _singles = ['tags']
+    _extract = ['center']
 
     def __init__(self, json_data) -> None:
         self._json_data = copy.deepcopy(json_data)
@@ -43,6 +48,7 @@ class OSMJsonDataProcessor:
         saved = self._saved[field_name]
 
         to_delete = []
+        to_add = {}
 
         for name in json_data:
             if name not in saved:
@@ -56,7 +62,16 @@ class OSMJsonDataProcessor:
                 elif name in self._singles:
                     json_data[name] = self._clear_json(json_data[name], name)
 
+                elif name in self._extract:
+                    for field in json_data[name]:
+                        to_add[field] = json_data[name][field]
+
+                    to_delete.append(name)
+
         for for_deletion in to_delete:
             json_data.pop(for_deletion)
+
+        for for_add_keys in to_add.keys():
+            json_data[for_add_keys] = to_add[for_add_keys]
 
         return json_data

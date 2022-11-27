@@ -71,14 +71,22 @@ class MapBulding(Enum):
 
 
 class MapObjects(Enum):
-    AMENITY = 0
-    SHOP = 1
-    SUBWAY = 2
-    TOURISM = 3
+    AMENITY = 0,
+    SHOP = 1,
+    SUBWAY = 2,
+    TOURISM = 3,
+    TRANSPORT = 4,
+    SPORT = 5,
+    OFFICE = 6,
+    WATER = 7
 
 QueryMapping = {
     MapObjects.AMENITY : 'amenity',
     MapObjects.SHOP : 'shop',
     MapObjects.SUBWAY : 'station',
-    MapObjects.TOURISM : 'tourism'
+    MapObjects.TOURISM : 'tourism',
+    MapObjects.TRANSPORT : 'public_transport',
+    MapObjects.SPORT : 'sport',
+    MapObjects.OFFICE : 'office',
+    MapObjects.WATER : 'water'
 }
