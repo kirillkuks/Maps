@@ -1,4 +1,5 @@
 from enum import Enum
+from numpy import sum as npsum
 
 class ECity(Enum):
     Saint_Petersburg = 0,
@@ -55,3 +56,6 @@ OverpassCityMapping = {
     ECity.Kaliningrad : City('Калининград', 490_449, 54.71666, 20.49991)
 }
 
+
+def get_total_population() -> int:
+    return npsum([OverpassCityMapping[city].population for city in OverpassCityMapping])

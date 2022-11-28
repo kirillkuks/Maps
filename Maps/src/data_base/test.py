@@ -1,9 +1,9 @@
 import sys
 import os
 
-abs_path = os.path.abspath(__file__)[0:os.path.abspath(__file__).rindex('\\')]
-print(abs_path[0:abs_path.rindex('\\')] + '\\data_loader')
-sys.path.append(abs_path[0:abs_path.rindex('\\')] + '\\data_loader')
+abs_path = os.path.abspath(__file__)[:os.path.abspath(__file__).rindex('\\')]
+print(abs_path[:abs_path.rindex('\\')] + '\\data_loader')
+sys.path.append(abs_path[:abs_path.rindex('\\')] + '\\data_loader')
 
 from cities import OverpassCityMapping
 
