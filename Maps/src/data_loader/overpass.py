@@ -1,4 +1,5 @@
 import requests
+import time
 from map_features import MapObjects, QueryMapping
 from cities import ECity, OverpassCityMapping
 
@@ -16,7 +17,13 @@ class Overpass:
 
         print(f'{map_object} : {response.status_code}')
 
-        if response.status_code != 204:
+        while (response.status_code == 429):
+            print('error 429: try again')
+            time.sleep(1)
+            response = requests.get(self._overpass_url, 
+                        params={'data': overpass_query})
+
+        if response.status_code == 200:
             data = response.json()
 
         return data
