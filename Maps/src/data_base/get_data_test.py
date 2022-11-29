@@ -28,6 +28,8 @@ def print_counts(data_frame: DataFrame) -> None:
     print(f'Water - river: {data_frame.filter(data_frame.tags.water == "river").count()}')
     print(f'Sport - all: {data_frame.filter(col("tags.sport").isNotNull()).count()}')
     print(f'Amenity - cafe, restaraunt : {data_frame.filter((data_frame.tags.amenity == "cafe") | (data_frame.tags.amenity == "restaurant")).count()}')
+    print(f'Amenity - police : {data_frame.filter((data_frame.tags.amenity == "police")).count()}')
+    print(f'Amenity - fire_station : {data_frame.filter(data_frame.tags.amenity == "fire_station").count()}')
 
 
 def main():

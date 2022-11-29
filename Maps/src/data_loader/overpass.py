@@ -23,6 +23,8 @@ class Overpass:
             response = requests.get(self._overpass_url, 
                         params={'data': overpass_query})
 
+        print(f'{map_object} : {response.status_code}')
+
         if response.status_code == 200:
             data = response.json()
 
