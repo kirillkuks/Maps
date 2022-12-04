@@ -3,6 +3,12 @@ from pyspark.sql.types import StructType, StructField, DoubleType, StringType
 
 from functools import reduce
 
+import os
+import sys
+
+os.environ['PYSPARK_PYTHON'] = sys.executable
+os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
+
 
 class Spark:
     _spark: SparkSession = None
@@ -37,11 +43,14 @@ class Spark:
 
     @staticmethod
     def get_spark_session() -> SparkSession:
+        if Spark._spark is None:
+            Spark()
+            
         return Spark._spark
 
     def __init__(self) -> None:
-        if self._spark is None:
-            self._spark = SparkSession \
+        if Spark._spark is None:
+            Spark._spark = SparkSession \
                 .builder \
                 .appName('Cities') \
                 .master('local') \
@@ -49,7 +58,7 @@ class Spark:
                 .getOrCreate()
 
     def get_data_frame(self, collection_name: str) -> DataFrame:
-        return self._spark.read \
+        return Spark._spark.read \
             .format('com.mongodb.spark.sql.DefaultSource') \
             .schema(self._defaultSchema) \
             .option('uri', f'mongodb://localhost:27017/maps.{collection_name}') \

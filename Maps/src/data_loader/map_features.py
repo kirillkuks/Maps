@@ -78,7 +78,8 @@ class MapObjects(Enum):
     TRANSPORT = 4,
     SPORT = 5,
     OFFICE = 6,
-    WATER = 7
+    WATER = 7,
+    BOUNDARY = 8
 
 QueryMapping = {
     MapObjects.AMENITY : 'amenity',
@@ -88,5 +89,6 @@ QueryMapping = {
     MapObjects.TRANSPORT : 'public_transport',
     MapObjects.SPORT : 'sport',
     MapObjects.OFFICE : 'office',
-    MapObjects.WATER : 'water'
+    MapObjects.WATER : 'water',
+    MapObjects.BOUNDARY : 'boundary'
 }

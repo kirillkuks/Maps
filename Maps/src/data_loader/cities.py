@@ -33,8 +33,7 @@ class City:
     def __init__(self, _name : str, _population : int, _lat : float, _lon : float) -> None:
         self.name = _name
         self.population = _population
-        self.center.lat = _lat
-        self.center.lot = _lon
+        self.center = City.Center(_lat, _lon)
 
 
 OverpassCityMapping = {
@@ -55,7 +54,6 @@ OverpassCityMapping = {
     ECity.Volgograd : City('Волгоград', 1_028_036, 48.71167, 44.51389),
     ECity.Kaliningrad : City('Калининград', 490_449, 54.71666, 20.49991)
 }
-
 
 def get_total_population() -> int:
     return npsum([OverpassCityMapping[city].population for city in OverpassCityMapping])

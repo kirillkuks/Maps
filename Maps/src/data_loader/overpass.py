@@ -7,7 +7,7 @@ class Overpass:
     def __init__(self) -> None:
         self._overpass_url = 'http://overpass-api.de/api/interpreter'
 
-    def request(self, city : ECity, map_object : OverpassCityMapping):
+    def request(self, city : ECity, map_object : MapObjects):
         overpass_query = self._query(city=OverpassCityMapping[city].name, tag=QueryMapping[map_object])
         response = requests.get(self._overpass_url, 
                         params={'data': overpass_query})
@@ -15,10 +15,8 @@ class Overpass:
         data = {}
         response.encoding = 'utf-8'
 
-        print(f'{map_object} : {response.status_code}')
-
-        while (response.status_code == 429):
-            print('error 429: try again')
+        while response.status_code != 200:
+            print(f'error {response.status_code}: try again')
             time.sleep(1)
             response = requests.get(self._overpass_url, 
                         params={'data': overpass_query})
