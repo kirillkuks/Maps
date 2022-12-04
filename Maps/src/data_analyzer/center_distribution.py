@@ -122,9 +122,7 @@ def center_distribution():
 
         print(f'Time({OverpassCityMapping[city].name}) : {end - start}')
 
-        plot_kdes(per_object_dists, labels, OverpassCityMapping[city].name)
-
-        break
+        #plot_kdes(per_object_dists, labels, OverpassCityMapping[city].name)
 
         for dists, label in zip(per_object_dists, labels):
             plot_hist(dists, OverpassCityMapping[city].name, label)
