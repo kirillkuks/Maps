@@ -45,7 +45,7 @@ class Analyzer:
         self._a_tags = a_tags
         self._city_name = city[0].name
 
-        _nx_hexagon = round((city[1].b_box.lon_max - city[1].b_box.lon_min / 0.02))
+        self._nx_hexagon = round(((city[1].b_box.lon_max - city[1].b_box.lon_min) / 0.03))
 
         px.set_mapbox_access_token(open(token_path).read())
         total_df = self._get_total_df(self._spark.get_data_frame(self._city_name), city[1])
@@ -250,7 +250,6 @@ class Analyzer:
             elif self._is_in_hex(lat, lon, self._hexes[i_hex2]):
                 return i_hex2
             else:
-                print("wtf")
                 return i_hex1
         # тут должно быть определение, в какой из двух ячеек лежит точка
 
