@@ -233,7 +233,6 @@ class Analyzer:
             elif self._is_in_hex(lat, lon, self._hexes[i_hex2]):
                 return i_hex2
             else:
-                print("wtf")
                 return i_hex1
         # тут должно быть определение, в какой из двух ячеек лежит точка
         else:
