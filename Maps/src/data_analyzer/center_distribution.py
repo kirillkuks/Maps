@@ -12,16 +12,9 @@ from numpy import floor
 
 from timeit import default_timer
 
-import pandas as pd
 import seaborn as sns
 
-import sys
-import os
-
-abs_path = os.path.abspath(__file__)[:os.path.abspath(__file__).rindex('\\')]
-sys.path.append(abs_path[:abs_path.rindex('\\')] + '\\data_loader')
-
-from cities import OverpassCityMapping, get_total_population, ECity, City
+from imports import OverpassCityMapping, ECity, City, Visualizer
 
 RESULT_DIR = 'results/center_distribution'
 
@@ -59,47 +52,6 @@ def calculate_all_center_distribution(data_frame: DataFrame, city: ECity):
             [label for label in elems]
 
 
-def plot_hist(dists: list, name: str, obj: str):
-    df = pd.DataFrame(data=dists)
-
-    quant_5, quant_25, quant_50, quant_75, quant_95 = df.quantile(0.05).item(), \
-        df.quantile(0.25).item(), \
-        df.quantile(0.50).item(), \
-        df.quantile(0.75).item(), \
-        df.quantile(0.95).item()
-
-    quants = [
-        [quant_5, 0.6, 0.16],
-        [quant_25, 0.8, 0.26],
-        [quant_50, 1.0, 0.36],
-        [quant_75, 0.8, 0.46],
-        [quant_95, 0.6, 0.56]
-    ]
-
-    fig, ax = plt.subplots(figsize=(6, 4))
-    plt.style.use('bmh')
-    ax.set_xlim([0, max(dists)])
-
-    ax.hist(dists, density=True, bins=int(floor(1.72 * (len(dists) ** (1.0 / 3.0)))), alpha=0.50, edgecolor='black')
-    sns.kdeplot(dists, bw_method=0.5, color='red')
-
-    y_max = ax.get_ylim()[1]
-
-    texts = ['5th', '25th', '50th', '75th', '95th']
-
-    for q, text in zip(quants, texts):
-        ax.axvline(q[0], alpha=q[1], ymax=q[2], linestyle=':')
-        ax.text(q[0], (q[2] + 0.01) * y_max, text, color='black', ha='left', va='center')
-
-    ax.grid(False)
-
-    plt.xlabel('Расстояние (км)')
-    plt.ylabel('Частота')
-    plt.title(f'Распределение {obj.lower()} при удалении от центра. \n{name}')
-
-    plt.savefig(f'{RESULT_DIR}/{name}_{obj}.png', dpi=300)
-
-
 def plot_kdes(dists, labels, name):
     for dist, label in zip(dists, labels):
         sns.kdeplot(dist, bw_method=0.5, label=label)
@@ -112,6 +64,7 @@ def plot_kdes(dists, labels, name):
 
 def center_distribution():
     spark = Spark()
+    visualizer = Visualizer(RESULT_DIR)
 
     start = default_timer()
 
@@ -122,10 +75,13 @@ def center_distribution():
 
         print(f'Time({OverpassCityMapping[city].name}) : {end - start}')
 
-        #plot_kdes(per_object_dists, labels, OverpassCityMapping[city].name)
-
         for dists, label in zip(per_object_dists, labels):
-            plot_hist(dists, OverpassCityMapping[city].name, label)
+            visualizer.plot_hist(
+                dists,
+                OverpassCityMapping[city].name,
+                label,
+                [f'Распределение {label.lower()} при удалении от центра. \n{OverpassCityMapping[city].name}', 'Расстояние (км)', 'Частота']
+            )
 
 
     end = default_timer()

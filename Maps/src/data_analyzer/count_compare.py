@@ -5,17 +5,13 @@ from pyspark.sql.functions import col
 from pyspark.sql.types import BooleanType
 
 from functools import reduce
-from matplotlib import pyplot as plt
+from timeit import default_timer
 
 import operator
 
-import sys
-import os
+from imports import OverpassCityMapping, ECity, Visualizer
 
-abs_path = os.path.abspath(__file__)[:os.path.abspath(__file__).rindex('\\')]
-sys.path.append(abs_path[:abs_path.rindex('\\')] + '\\data_loader')
-
-from cities import OverpassCityMapping, get_total_population, ECity
+RESULT_DIR = 'results/count_compare'
 
 
 def print_counts(data_frame: DataFrame) -> None:
@@ -44,16 +40,15 @@ def print_counts(data_frame: DataFrame) -> None:
 
 
 def get_counts(data_frame: DataFrame) -> list:
-    data_frame.show()
     amenity_elems = {
         'Больницы' : ['hospital', 'clinic'],
+        'Университеты' : ['university'],
         'Церкви' : ['place_of_worship'],
         'Школы' : ['school'],
-        'Университеты' : ['university'],
-        'Аптеки' : ['pharmacy'],
-        'Кафе' : ['cafe', 'restaurant'],
         'Полицейские участки' : ['police'],
-        'Пожарные станции' : ['fire_station']
+        'Аптеки' : ['pharmacy'],
+        'Пожарные станции' : ['fire_station'],
+        'Кафе' : ['cafe', 'restaurant'],
     }
 
     shop_elems = {
@@ -94,10 +89,32 @@ def get_counts(data_frame: DataFrame) -> list:
 
 def calculate_count():
     spark = Spark()
+    visualizer = Visualizer(RESULT_DIR)
+
+    start = default_timer()
 
     counts, labels = get_counts(spark.get_union_data_frame([city.name for city in OverpassCityMapping]))
-    plt.pie(counts, labels=labels, autopct='%1.1f%%', pctdistance=0.85, explode=[0.05 for _ in range(len(counts))])
-    plt.show()
+
+    visualizer.plot_donut(
+        counts,
+        labels,
+        'Все города',
+        ['Распределение учреждений по количеству. \nВсе города']
+    )
+
+    for city in OverpassCityMapping:
+        counts, labels = get_counts(spark.get_data_frame(city.name))
+
+        visualizer.plot_donut(
+            counts,
+            labels,
+            OverpassCityMapping[city].name,
+            [f'Распределение учреждений по количеству. \n{OverpassCityMapping[city].name}']
+        )
+
+    end = default_timer()
+
+    print(f'Time: {end - start}')
 
 if __name__ == '__main__':
     calculate_count()

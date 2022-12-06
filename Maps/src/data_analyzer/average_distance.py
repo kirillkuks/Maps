@@ -22,6 +22,8 @@ sys.path.append(abs_path[:abs_path.rindex('\\')] + '\\data_loader')
 
 from cities import OverpassCityMapping, get_total_population, ECity
 
+from imports import OverpassCityMapping, Visualizer
+
 RESULT_DIR = 'results/average_dist'
 
 
@@ -93,29 +95,10 @@ def calculate_all_average_distances(data_frame: DataFrame):
     return [dist.dist for dist in dists], [label for label in elems], [dist.count for dist in dists]
 
 
-def plot_bar(dists, labels, name):
-    fig, ax = plt.subplots()
-    width = 0.75
-    ind = arange(len(dists))
-    ax.barh(ind, dists, 0.75, color='green')
-    ax.set_yticks(ind + width / 2)
-    ax.set_yticklabels(['' for _ in range(len(dists))], minor=False)
-
-    for bar, label, dist in zip(ax.patches, labels, dists):
-        ax.text(0.1, bar.get_y() + bar.get_height() / 2, f'{label}, {round(dist, 2)}', color='black', ha='left', va='center')        
-
-    plt.xlim([0, 5])
-
-    plt.xlabel('Расстояние (км)')
-    plt.ylabel('Учреждение')
-    plt.title(f'Среднее расстояние между учреждениями одного типа. \n{name}')
-
-    plt.margins(0, 0.05)
-    plt.savefig(f'{RESULT_DIR}/{name}.png', dpi=300)
-
-
 def average_distance():
     spark = Spark()
+    visualizer = Visualizer(RESULT_DIR)
+    visualizer.set_plot_color('green')
 
     start = default_timer()
 
@@ -126,7 +109,12 @@ def average_distance():
         city_dists, labels, city_counts = calculate_all_average_distances(spark.get_data_frame(city.name))
         all_dists[city] = city_dists
 
-        plot_bar(city_dists, labels, OverpassCityMapping[city].name)
+        visualizer.plot_bar(
+            city_dists,
+            labels,
+            OverpassCityMapping[city].name
+            [f'Среднее расстояние между учреждениями одного типа. \n{OverpassCityMapping[city].name}', 'Расстояние (км)', 'Учреждение']
+        )
 
         end = default_timer()
 
@@ -138,7 +126,12 @@ def average_distance():
     sum_dist = reduce(sum_arrays, [all_dists[city] for city in OverpassCityMapping])
     average_dist = [dist / len(OverpassCityMapping) for dist in sum_dist]
 
-    plot_bar(average_dist, labels, 'Среднее по городам')
+    visualizer.plot_bar(
+        average_dist,
+        labels,
+        'Среднее по городам'
+        [f'Среднее расстояние между учреждениями одного типа. \nВсе города', 'Расстояние (км)', 'Учреждение']
+    )
 
     end = default_timer()
 
