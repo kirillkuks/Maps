@@ -38,7 +38,8 @@ class Analyzer:
 
     _all_sums: [] = None
 
-    _nx_hexagon = 10
+    _nx_hexagon = 0
+    _zoom = 0.0
 
     def __init__(self, token_path: str, city: tuple, a_tags: dict) -> None:
         self._spark = Spark()
@@ -46,6 +47,13 @@ class Analyzer:
         self._city_name = city[0].name
 
         self._nx_hexagon = round(((city[1].b_box.lon_max - city[1].b_box.lon_min) / 0.03))
+
+        if self._nx_hexagon > 30:
+            self._zoom = 8
+        elif self._nx_hexagon > 14:
+            self._zoom = 9
+        else:
+            self._zoom = 10
 
         px.set_mapbox_access_token(open(token_path).read())
         total_df = self._get_total_df(self._spark.get_data_frame(self._city_name), city[1])
@@ -60,9 +68,10 @@ class Analyzer:
 
         fig = ff.create_hexbin_mapbox(
             data_frame=dfp, lat="lon", lon="lat",
-            nx_hexagon=self._nx_hexagon, opacity=0.2, labels={"color": "Point Count"},
+            nx_hexagon=self._nx_hexagon, opacity=0.2,
             color_continuous_scale="Viridis",
             min_count=2,
+            zoom=self._zoom,
             original_data_marker=dict(size=4, opacity=0.4, color="deeppink")
         )
         pio.write_image(fig, RESULT_DIR + "/" + self._city_name + "_" + str(p_lim) + "_" + str(part_deg) +
@@ -120,11 +129,11 @@ class Analyzer:
                     df = df.union(data_frame.filter("tags." + key.name + " == '" + tag + "'")).distinct()
                 self._all_sums.append(self._get_hexes_sums(df))
 
-    def _get_hexes_sums(self, df: DataFrame) -> ([], []):
+    def _get_hexes_sums(self, data_frame: DataFrame) -> ([], []):
         sums = [0 for x in range(len(self._hexes))]
         sums_wt_zeros = []
 
-        pdf = df.select('lat', 'lon').toPandas()
+        pdf = data_frame.select('lat', 'lon').toPandas()
 
         for i in range(pdf.shape[0]):
             #tmp = 0
@@ -139,7 +148,7 @@ class Analyzer:
             sums[ind] += 1
 
         for sum_ in sums:
-            if sum_ == 0:
+            if sum_ != 0:
                 sums_wt_zeros.append(sum_)
 
         '''for hex_ in self._hexes:
@@ -164,16 +173,26 @@ class Analyzer:
 
             if stat == EStat.Med:
                 stat_val = st.median(sums_wt_zeros)
-            elif self._stat == EStat.Mean:
+            elif stat == EStat.Mean:
                 stat_val = st.mean(sums_wt_zeros)
             else:
-                stat_val = 0
+                stat_val = 1
+
+            if stat_val == 0:
+                continue
 
             for i in range(len(sums)):
-                for j in range(part_deg):
+                b: int = math.floor(sums[i] * part_deg / stat_val)
+                if b > p_lim * part_deg:
+                    b = p_lim * part_deg
+
+                num_points[i] += b * 2
+
+
+                '''for j in range(1, part_deg + 1):
                     if sums[i] <= stat_val * p_lim / part_deg * j:
                         break
-                    num_points[i] += 2
+                    num_points[i] += 2'''
 
     def _get_final_dataframe(self, num_points: []) -> pd.DataFrame:
         arr = []
